@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
-import DOMPurify from "isomorphic-dompurify";
 import { contactSchema } from "@/lib/contact-schema";
 import { rateLimit, getClientIp, maybeSweep } from "@/lib/rate-limit";
 
@@ -9,8 +8,8 @@ export const runtime = "nodejs";
 const MAX_BODY_BYTES = 16 * 1024; // 16 KB hard cap
 
 function safe(value: string): string {
-  // Strip all HTML; DOMPurify with no allowed tags = plain text
-  return DOMPurify.sanitize(value, { ALLOWED_TAGS: [], ALLOWED_ATTR: [] });
+  // Strip all HTML tags — no DOM dependency needed for plain-text form fields
+  return value.replace(/<[^>]*>/g, "").trim();
 }
 
 function htmlSafe(value: string): string {
